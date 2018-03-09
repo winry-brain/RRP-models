@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>RRP Altru 09 03 2018 v1</name>
+		<uuid>6b24ba9a-ad14-4d31-9f59-e208ab818266</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.6" isee:build_number="1375" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:simulation_delay="0.0015" method="Euler" time_units="Months" isee:instantaneous_flows="false">
+		<start>1</start>
+		<stop>1000</stop>
+		<dt>0.01</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+		</unit>
+		<unit name="Hours">
+			<eqn/>
+			<alias>hr</alias>
+			<alias>hour</alias>
+		</unit>
+		<unit name="Months">
+			<eqn/>
+			<alias>mo</alias>
+			<alias>month</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<stock name="Fresh\nWorkforce">
+				<eqn>4</eqn>
+				<inflow>Hiring_rate</inflow>
+				<outflow>Maturation_rate</outflow>
+				<non_negative/>
+				<units>writers</units>
+			</stock>
+			<flow name="Hiring\nrate">
+				<eqn>Attrition_rate</eqn>
+				<non_negative/>
+				<units>writers/Months</units>
+			</flow>
+			<flow name="Maturation\nrate">
+				<eqn>Fresh_Workforce/Maturation_time</eqn>
+				<non_negative/>
+				<units>writers/Months</units>
+			</flow>
+			<aux name="Maturation\ntime">
+				<eqn>2*12
+
+{2 years}</eqn>
+				<units>Months</units>
+			</aux>
+			<stock name="Experienced\nworkforce">
+				<eqn>5</eqn>
+				<inflow>Maturation_rate</inflow>
+				<outflow>Attrition_rate</outflow>
+				<non_negative/>
+				<units>writers</units>
+			</stock>
+			<flow name="Attrition\nrate">
+				<eqn>Experienced_workforce/Av_time_on_the_position</eqn>
+				<non_negative/>
+				<units>writers/Months</units>
+			</flow>
+			<stock name="Reports\nin process FW">
+				<eqn>500</eqn>
+				<inflow>Processing_rate_FW</inflow>
+				<outflow>Fulfillment_rate_FW</outflow>
+				<non_negative/>
+				<units>reports</units>
+			</stock>
+			<flow name="Processing\nrate FW">
+				<eqn>Fulfillment_rate_FW</eqn>
+				<non_negative/>
+				<units>reports/Months</units>
+			</flow>
+			<flow name="Fulfillment\nrate FW">
+				<eqn>Fresh_Workforce*Reports_per_FW_per_month</eqn>
+				<non_negative/>
+				<units>reports/Months</units>
+			</flow>
+			<stock name="Completed\nreports">
+				<eqn>0
+{?}</eqn>
+				<inflow>Fulfillment_rate_FW</inflow>
+				<inflow>Fullfilment_rate_EW</inflow>
+				<outflow>Obsoletion_rate</outflow>
+				<non_negative/>
+				<units>reports</units>
+			</stock>
+			<flow name="Report request\ncreation rate">
+				<eqn>Obsoletion_rate+New_reports_request_rate</eqn>
+				<non_negative/>
+				<units>reports/Months</units>
+			</flow>
+			<stock name="Report\nrequests">
+				<eqn>10000</eqn>
+				<inflow>Report_request_creation_rate</inflow>
+				<outflow>Processing_rate_FW</outflow>
+				<outflow>Processing_rate_EW</outflow>
+				<non_negative/>
+				<units>reports</units>
+			</stock>
+			<aux name="Av time\non the position">
+				<eqn>3*12
+{?3 years}</eqn>
+				<units>Months</units>
+			</aux>
+			<flow name="Obsoletion rate">
+				<eqn>(Revision_fraction+Maintainance_fraction)*Completed_reports</eqn>
+				<non_negative/>
+				<units>reports/Months</units>
+			</flow>
+			<group name="Parking lot" run="false">
+				<entity name="Obsoletion_rate"/>
+			</group>
+			<stock name="Reports\nin process EW">
+				<eqn>500</eqn>
+				<inflow>Processing_rate_EW</inflow>
+				<outflow>Fullfilment_rate_EW</outflow>
+				<non_negative/>
+				<units>reports</units>
+			</stock>
+			<flow name="Processing\nrate EW">
+				<eqn>Fullfilment_rate_EW
+{MIN(report requests,  how many Reports_&amp;_Productivity can be done in a months by EXP workers)}</eqn>
+				<non_negative/>
+				<units>reports/Months</units>
+			</flow>
+			<flow name="Fullfilment\nrate EW">
+				<eqn>Experienced_workforce*Reports_per_EW_per_month</eqn>
+				<non_negative/>
+				<units>reports/Months</units>
+			</flow>
+			<aux name="Revision\nfraction">
+				<eqn>0.005/12</eqn>
+				<units>Dimensionless/months</units>
+			</aux>
+			<aux name="Maintainance\nfraction">
+				<eqn>0.001/12</eqn>
+				<units>Dimensionless/months</units>
+			</aux>
+			<aux name="New reports\nrequest rate">
+				<eqn>1000</eqn>
+				<units>reports/months</units>
+			</aux>
+			<aux name="Time to fulfill\na report EW">
+				<eqn>4</eqn>
+				<units>hours/reports</units>
+			</aux>
+			<aux name="Time to fulfill\na report FW">
+				<eqn>8</eqn>
+				<units>Hours/reports</units>
+			</aux>
+			<aux name="Working hours\nper month">
+				<eqn>173</eqn>
+				<units>Hours/writers/months</units>
+			</aux>
+			<aux name="Reports per\nFW per month">
+				<eqn>Working_hours_per_month/Time_to_fulfill_a_report_FW</eqn>
+				<units>Reports/Writers/months</units>
+			</aux>
+			<aux name="Reports per\nEW per month">
+				<eqn>Working_hours_per_month/Time_to_fulfill_a_report_EW</eqn>
+				<units>Reports/writers/months</units>
+			</aux>
+			<aux name="Reports\nin progress">
+				<eqn>Reports_in_process_EW+Reports_in_process_FW</eqn>
+				<units>reports</units>
+			</aux>
+			<isee:dependencies>
+				<var name="Hiring_rate">
+					<in>Attrition_rate</in>
+				</var>
+				<var name="Maturation_rate">
+					<in>Maturation_time</in>
+					<in>Fresh_Workforce</in>
+				</var>
+				<var name="Attrition_rate">
+					<in>Av_time_on_the_position</in>
+					<in>Experienced_workforce</in>
+				</var>
+				<var name="Processing_rate_FW">
+					<in>Fulfillment_rate_FW</in>
+				</var>
+				<var name="Fulfillment_rate_FW">
+					<in>Fresh_Workforce</in>
+					<in>Reports_per_FW_per_month</in>
+				</var>
+				<var name="Report_request_creation_rate">
+					<in>Obsoletion_rate</in>
+					<in>New_reports_request_rate</in>
+				</var>
+				<var name="Obsoletion_rate">
+					<in>Revision_fraction</in>
+					<in>Maintainance_fraction</in>
+					<in>Completed_reports</in>
+				</var>
+				<var name="Processing_rate_EW">
+					<in>Fullfilment_rate_EW</in>
+				</var>
+				<var name="Fullfilment_rate_EW">
+					<in>Experienced_workforce</in>
+					<in>Reports_per_EW_per_month</in>
+				</var>
+				<var name="Reports_per_FW_per_month">
+					<in>Working_hours_per_month</in>
+					<in>Time_to_fulfill_a_report_FW</in>
+				</var>
+				<var name="Reports_per_EW_per_month">
+					<in>Working_hours_per_month</in>
+					<in>Time_to_fulfill_a_report_EW</in>
+				</var>
+				<var name="Reports_in_progress">
+					<in>Reports_in_process_EW</in>
+					<in>Reports_in_process_FW</in>
+				</var>
+			</isee:dependencies>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" transparent="false" corner_radius="0" isee:flat="false" icon_side="top"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" isee:always_show_hover_tip="false" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+			</style>
+			<view isee:show_pages="false" isee:converter_size="name_only" page_width="1320" page_height="1020" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="16pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="16pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="16pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="16pt" label_side="bottom">
+						<shape type="name_only"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous"/>
+				</style>
+				<stock label_side="center" x="395.513" y="255.774" width="102.5" height="45.8333" name="Fresh\nWorkforce"/>
+				<flow label_side="right" x="438" y="194.887" width="18" height="18" name="Hiring\nrate">
+					<pts>
+						<pt x="447" y="152"/>
+						<pt x="447" y="255.774"/>
+					</pts>
+				</flow>
+				<flow label_side="right" x="450.358" y="339.461" name="Maturation\nrate">
+					<pts>
+						<pt x="450.358" y="301.607"/>
+						<pt x="450.358" y="389.315"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="525.572" y="378.024" width="77" height="38" name="Maturation\ntime"/>
+				<connector uid="1" angle="153.151">
+					<from>Maturation_time</from>
+					<to>Maturation_rate</to>
+				</connector>
+				<connector uid="2" angle="252.29">
+					<from>Fresh_Workforce</from>
+					<to>Maturation_rate</to>
+				</connector>
+				<stock label_side="center" x="401.583" y="389.315" width="110.833" height="45" name="Experienced\nworkforce"/>
+				<flow label_side="right" x="446" y="464.158" name="Attrition\nrate">
+					<pts>
+						<pt x="446" y="434.315"/>
+						<pt x="446" y="515"/>
+					</pts>
+				</flow>
+				<stock label_side="center" x="341.417" y="88.833" width="148.333" height="40" name="Reports\nin process FW"/>
+				<flow label_side="top" x="268.813" y="109.083" name="Processing\nrate FW">
+					<pts>
+						<pt x="208.209" y="292.464"/>
+						<pt x="208.209" y="109.083"/>
+						<pt x="341.417" y="109.083"/>
+					</pts>
+				</flow>
+				<flow label_side="top" x="647.375" y="108" name="Fulfillment\nrate FW">
+					<pts>
+						<pt x="489.75" y="108"/>
+						<pt x="805" y="108"/>
+						<pt x="805" y="281.52"/>
+					</pts>
+				</flow>
+				<text_box uid="3" x="1423.91" y="69.4655" width="268.334" height="405.976">Types of reports:
+- urgent requests
+- revised requests
+- maintainance of reports (broken reports)
+- phone/informal requests 
+-new reports
+
+</text_box>
+				<stock label_side="center" x="760.221" y="281.52" width="86.6667" height="53.8889" name="Completed\nreports"/>
+				<flow label_side="bottom" x="97.5626" y="312.464" name="Report request\ncreation rate">
+					<pts>
+						<pt x="34" y="312.464"/>
+						<pt x="161.125" y="312.464"/>
+					</pts>
+				</flow>
+				<stock label_side="center" x="161.125" y="292.464" width="94.1667" height="40" name="Report\nrequests"/>
+				<connector uid="4" angle="155.898">
+					<from>Attrition_rate</from>
+					<to>Hiring_rate</to>
+				</connector>
+				<aux x="483.941" y="506.059" width="105" height="38" name="Av time\non the position"/>
+				<connector uid="5" angle="146.045">
+					<from>Av_time_on_the_position</from>
+					<to>Attrition_rate</to>
+				</connector>
+				<connector uid="6" angle="226.38">
+					<from>Experienced_workforce</from>
+					<to>Attrition_rate</to>
+				</connector>
+				<flow label_side="top" x="879.158" y="302.497" width="18" height="18" name="Obsoletion rate">
+					<pts>
+						<pt x="846.887" y="311.497"/>
+						<pt x="953.429" y="311.497"/>
+					</pts>
+				</flow>
+				<group locked="true" x="1392.74" y="67.5448" width="430" height="559.833" name="Parking lot">
+					<item uid="7"/>
+					<item uid="3"/>
+				</group>
+				<text_box uid="7" x="1418.5" y="243.453" width="260" height="58">Assumptions:
+- Fresh/Total workforce ratio -&gt;const</text_box>
+				<connector uid="8" angle="340.369">
+					<from>Experienced_workforce</from>
+					<to>Fullfilment_rate_EW</to>
+				</connector>
+				<stock label_side="center" x="367.143" y="565.75" width="135.833" height="35" name="Reports\nin process EW"/>
+				<flow label_side="bottom" x="282.027" y="583.25" name="Processing\nrate EW">
+					<pts>
+						<pt x="208.911" y="332.464"/>
+						<pt x="208.911" y="583.25"/>
+						<pt x="367.143" y="583.25"/>
+					</pts>
+				</flow>
+				<flow label_side="bottom" x="645.988" y="574.25" width="18" height="18" name="Fullfilment\nrate EW">
+					<pts>
+						<pt x="502.976" y="583.25"/>
+						<pt x="807" y="583.25"/>
+						<pt x="807" y="335.409"/>
+					</pts>
+				</flow>
+				<aux x="902.029" y="189.762" width="64" height="38" name="Revision\nfraction"/>
+				<aux x="926.101" y="351.315" width="97" height="38" name="Maintainance\nfraction"/>
+				<connector uid="9" angle="245.939">
+					<from>Revision_fraction</from>
+					<to>Obsoletion_rate</to>
+				</connector>
+				<connector uid="10" angle="145.767">
+					<from>Maintainance_fraction</from>
+					<to>Obsoletion_rate</to>
+				</connector>
+				<connector uid="11" angle="357.947">
+					<from>Completed_reports</from>
+					<to>Obsoletion_rate</to>
+				</connector>
+				<connector uid="12" angle="280.737">
+					<from>Obsoletion_rate</from>
+					<to>Report_request_creation_rate</to>
+				</connector>
+				<aux x="30.4286" y="199.639" width="88" height="38" name="New reports\nrequest rate"/>
+				<connector uid="13" angle="297.241">
+					<from>New_reports_request_rate</from>
+					<to>Report_request_creation_rate</to>
+				</connector>
+				<aux x="691.143" y="472.409" width="88" height="38" name="Time to fulfill\na report EW"/>
+				<aux x="698.143" y="121.308" width="88" height="38" name="Time to fulfill\na report FW"/>
+				<connector uid="14" angle="35.6534">
+					<from>Fresh_Workforce</from>
+					<to>Fulfillment_rate_FW</to>
+				</connector>
+				<aux x="606.686" y="281.464" width="104" height="38" name="Working hours\nper month"/>
+				<aux x="613.143" y="183.238" width="102" height="38" name="Reports per\nFW per month"/>
+				<aux x="607.186" y="404.012" width="103" height="38" name="Reports per\nEW per month"/>
+				<connector uid="15" angle="86.8197">
+					<from>Working_hours_per_month</from>
+					<to>Reports_per_FW_per_month</to>
+				</connector>
+				<connector uid="16" angle="218.448">
+					<from>Time_to_fulfill_a_report_FW</from>
+					<to>Reports_per_FW_per_month</to>
+				</connector>
+				<connector uid="17" angle="270">
+					<from>Working_hours_per_month</from>
+					<to>Reports_per_EW_per_month</to>
+				</connector>
+				<connector uid="18" angle="138.185">
+					<from>Time_to_fulfill_a_report_EW</from>
+					<to>Reports_per_EW_per_month</to>
+				</connector>
+				<connector uid="19" angle="100.089">
+					<from>Reports_per_FW_per_month</from>
+					<to>Fulfillment_rate_FW</to>
+				</connector>
+				<connector uid="20" angle="268.678">
+					<from>Reports_per_EW_per_month</from>
+					<to>Fullfilment_rate_EW</to>
+				</connector>
+				<connector uid="21" angle="139.525">
+					<from>Fulfillment_rate_FW</from>
+					<to>Processing_rate_FW</to>
+				</connector>
+				<connector uid="22" angle="208.375">
+					<from>Fullfilment_rate_EW</from>
+					<to>Processing_rate_EW</to>
+				</connector>
+				<stacked_container uid="23" x="1203" y="195.497">
+					<graph x="1028" y="70.497" width="350" height="250" type="time_series" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Graph" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Report_requests"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Completed_reports"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" pen_width="1" index="2" show_y_axis="true">
+							<entity name="Reports_in_progress"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="227.813" y="378.024" width="82" height="38" name="Reports\nin progress"/>
+				<connector uid="24" angle="131.756">
+					<from>Reports_in_process_EW</from>
+					<to>Reports_in_progress</to>
+				</connector>
+				<connector uid="25" angle="243.011">
+					<from>Reports_in_process_FW</from>
+					<to>Reports_in_progress</to>
+				</connector>
+				<stacked_container uid="26" x="1033" y="335.409" width="350" height="250">
+					<graph x="1033" y="335.409" width="350" height="250" type="time_series" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Graph" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Fresh_Workforce"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Experienced_workforce"/>
+						</plot>
+					</graph>
+				</stacked_container>
+			</view>
+			<view isee:show_pages="false" background="white" page_width="800" page_height="600" home_view="true" type="interface">
+				<style/>
+			</view>
+			<isee:templates>
+				<view isee:show_pages="false" background="white" page_width="800" page_height="600" type="template">
+					<style/>
+				</view>
+			</isee:templates>
+			<isee:stories/>
+		</views>
+	</model>
+</xmile>
+
